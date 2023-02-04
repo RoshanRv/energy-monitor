@@ -16,6 +16,7 @@ import {
     ChartData,
 } from "chart.js"
 import { Line } from "react-chartjs-2"
+import AlertModal from "./components/AlertModal"
 
 ChartJS.register(
     CategoryScale,
@@ -68,7 +69,11 @@ function App() {
 
     useEffect(() => {
         if (currentData) {
-            if (currentData[99]?.current > thresholdVal) setIsOverLimit(true)
+            if (
+                currentData[99]?.current > thresholdVal &&
+                currentData[98]?.current < thresholdVal
+            )
+                setIsOverLimit(true)
             setIsOverLimit(false)
 
             const avgData =
@@ -134,7 +139,7 @@ function App() {
     }
 
     return (
-        <div className=" bg-[url('bg.svg')] min-h-screen bg-no-repeat bg-cover flex flex-col  items-center p-10">
+        <div className=" bg-gray-800 g-[url('bg.svg')] min-h-screen bg-no-repeat bg-cover flex flex-col  items-center p-10">
             {/*   Title   */}
             <h1 className="text-4xl text-amber-600 font-bold px-10 py-3 bg-white border-2 border-black shadow-lg rounded-lg">
                 Electricity Monitor
@@ -147,7 +152,7 @@ function App() {
             {currentData.length > 0 && (
                 <div className="mt-10 flex justify-around">
                     {/*     Threshold Value   */}
-                    <div className="bg-white p-3 rounded-lg border-2 border-black flex flex-col gap-y-2  shadow-md shadow-black/40">
+                    <div className="text-lg bg-white p-3 rounded-lg border-2 border-black flex flex-col gap-y-2  shadow-md shadow-black/40">
                         <h1>Set Threshold Value</h1>
                         <input
                             type="number"
@@ -160,10 +165,10 @@ function App() {
                     </div>
 
                     {/*       Report     */}
-                    <div className="bg-white p-2">
-                        <div className="flex">
+                    <div className="bg-white p-4 rounded-lg border-2 border-black flex flex-col justify-center items-center gap-y-2 text-xl">
+                        <div className="flex items-center">
                             <h1>Current :</h1>
-                            <h1 className="inline-flex">
+                            <h1 className="inline-flex items-center">
                                 {currentData[99].current}
                                 {currentSign.current == "rise" ? (
                                     <AiFillCaretUp className="text-red-600" />
@@ -179,6 +184,13 @@ function App() {
                         </div>
                     </div>
                 </div>
+            )}
+            {isOverLimit && (
+                <AlertModal
+                    hide={setIsOverLimit}
+                    powerVal={currentData[99]?.current}
+                    time={currentData[99]?.timestamp}
+                />
             )}
         </div>
     )
